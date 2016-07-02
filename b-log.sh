@@ -81,7 +81,8 @@ function B_LOG(){
         echo "--file-prefix-disable disable the prefix for the log file"
         echo "--file-suffix-enable enable the suffix for the log file"
         echo "--file-suffix-disable disable the suffix for the log file"
-        echo "-s --syslog 'xxx'"
+        echo "-s --syslog 'switches you want to use'."
+        echo " results in the command 'logger switches log-message"
         echo "-l --log-level the level of the log"
         echo "  Log levels      : value"
         echo " ---------------- : -----"
@@ -304,11 +305,9 @@ function B_LOG_MESSAGE() {
     fi
     # output to syslog
     if [ ! -z "${B_LOG_LOG_VIA_SYSLOG}" ]; then
-        # got syslog
-        :
+        logger ${B_LOG_LOG_VIA_SYSLOG} "${B_LOG_CONVERTED_TEMPLATE_STRING}" || err_ret_code=$?
+        B_LOG_ERR "${err_ret_code}" "Error while logging with syslog. Where these flags ok: '${B_LOG_LOG_VIA_SYSLOG}'"
     fi
-
-
 }
 
 # set alias for log level command
