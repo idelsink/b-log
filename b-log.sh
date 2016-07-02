@@ -1,7 +1,7 @@
 #!/bin/bash
 #########################################################################
 # Script Name: b-log
-# Script Version: 0.0.1
+# Script Version: 1.0.0
 # Script Date: 30 June 2016
 #########################################################################
 #
@@ -13,7 +13,7 @@ set -e          # kill script if a command fails
 set -o nounset  # unset values give error
 set -o pipefail # prevents errors in a pipeline from being masked
 
-B_LOG_VERSION=0.0.1
+B_LOG_VERSION=1.0.0
 B_LOG_APPNAME="b-log"
 
 # --- global variables ----------------------------------------------
