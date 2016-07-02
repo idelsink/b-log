@@ -22,9 +22,10 @@ readonly LOG_LEVEL_OFF=0        # none
 readonly LOG_LEVEL_FATAL=100    # unusable, crash
 readonly LOG_LEVEL_ERROR=200    # error conditions
 readonly LOG_LEVEL_WARN=300     # warning conditions
-readonly LOG_LEVEL_INFO=400     # informational
-readonly LOG_LEVEL_DEBUG=500    # debug-level messages
-readonly LOG_LEVEL_TRACE=600    # see stack traces
+readonly LOG_LEVEL_NOTICE=400   # Nothing serious, but notably nevertheless.
+readonly LOG_LEVEL_INFO=500     # informational
+readonly LOG_LEVEL_DEBUG=600    # debug-level messages
+readonly LOG_LEVEL_TRACE=700    # see stack traces
 readonly LOG_LEVEL_ALL=-1       # all enabled
 
 #############################
@@ -44,16 +45,17 @@ readonly LOG_LEVEL_ALL=-1       # all enabled
 # 4: line number
 # 5: log message
 # 6: space
-B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@5:2@][@3@:@3:4@] @5@" ) # default template
+B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@6:2@][@3@:@3:4@] @5@" ) # default template
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
-    ${LOG_LEVEL_FATAL}  "FATAL" "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
-    ${LOG_LEVEL_ERROR}  "ERROR" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
-    ${LOG_LEVEL_WARN}   "WARN"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
-    ${LOG_LEVEL_INFO}   "INFO"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
-    ${LOG_LEVEL_DEBUG}  "DEBUG" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
-    ${LOG_LEVEL_TRACE}  "TRACE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
+    ${LOG_LEVEL_FATAL}  "FATAL"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
+    ${LOG_LEVEL_ERROR}  "ERROR"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
+    ${LOG_LEVEL_WARN}   "WARN"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
+    ${LOG_LEVEL_NOTICE} "NOTICE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;32m" "\e[0m"
+    ${LOG_LEVEL_INFO}   "INFO"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
+    ${LOG_LEVEL_DEBUG}  "DEBUG"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
+    ${LOG_LEVEL_TRACE}  "TRACE"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
 )
 # log levels columns
 readonly LOG_LEVELS_LEVEL=0
@@ -106,15 +108,16 @@ function B_LOG(){
         echo "  -s --syslog             'switches you want to use'. None set means disabled"
         echo "                          results in: \"logger 'switches' log-message\""
         echo "  -l --log-level          The log level"
-        echo "                          Log levels      : value"
-        echo "                          --------------- : -----"
-        echo "                          LOG_LEVEL_OFF   : ${LOG_LEVEL_OFF}"
-        echo "                          LOG_LEVEL_FATAL : ${LOG_LEVEL_FATAL}"
-        echo "                          LOG_LEVEL_ERROR : ${LOG_LEVEL_ERROR}"
-        echo "                          LOG_LEVEL_WARN  : ${LOG_LEVEL_WARN}"
-        echo "                          LOG_LEVEL_INFO  : ${LOG_LEVEL_INFO}"
-        echo "                          LOG_LEVEL_DEBUG : ${LOG_LEVEL_DEBUG}"
-        echo "                          LOG_LEVEL_TRACE : ${LOG_LEVEL_TRACE}"
+        echo "                          Log levels       : value"
+        echo "                          ---------------- : -----"
+        echo "                          LOG_LEVEL_OFF    : ${LOG_LEVEL_OFF}"
+        echo "                          LOG_LEVEL_FATAL  : ${LOG_LEVEL_FATAL}"
+        echo "                          LOG_LEVEL_ERROR  : ${LOG_LEVEL_ERROR}"
+        echo "                          LOG_LEVEL_WARN   : ${LOG_LEVEL_WARN}"
+        echo "                          LOG_LEVEL_NOTICE : ${LOG_LEVEL_NOTICE}"
+        echo "                          LOG_LEVEL_INFO   : ${LOG_LEVEL_INFO}"
+        echo "                          LOG_LEVEL_DEBUG  : ${LOG_LEVEL_DEBUG}"
+        echo "                          LOG_LEVEL_TRACE  : ${LOG_LEVEL_TRACE}"
         echo ""
     }
     for arg in "$@"; do # transform long options to short ones
@@ -352,6 +355,7 @@ alias LOG_LEVEL_OFF="B_LOG --log-level ${LOG_LEVEL_OFF}"
 alias LOG_LEVEL_FATAL="B_LOG --log-level ${LOG_LEVEL_FATAL}"
 alias LOG_LEVEL_ERROR="B_LOG --log-level ${LOG_LEVEL_ERROR}"
 alias LOG_LEVEL_WARN="B_LOG --log-level ${LOG_LEVEL_WARN}"
+alias LOG_LEVEL_NOTICE="B_LOG --log-level ${LOG_LEVEL_NOTICE}"
 alias LOG_LEVEL_INFO="B_LOG --log-level ${LOG_LEVEL_INFO}"
 alias LOG_LEVEL_DEBUG="B_LOG --log-level ${LOG_LEVEL_DEBUG}"
 alias LOG_LEVEL_TRACE="B_LOG --log-level ${LOG_LEVEL_TRACE}"
@@ -361,6 +365,7 @@ alias LOG_LEVEL_ALL="B_LOG --log-level ${LOG_LEVEL_ALL}"
 alias FATAL="B_LOG_MESSAGE ${LOG_LEVEL_FATAL} "
 alias ERROR="B_LOG_MESSAGE ${LOG_LEVEL_ERROR} "
 alias WARN="B_LOG_MESSAGE ${LOG_LEVEL_WARN} "
+alias NOTICE="B_LOG_MESSAGE ${LOG_LEVEL_NOTICE} "
 alias INFO="B_LOG_MESSAGE ${LOG_LEVEL_INFO} "
 alias DEBUG="B_LOG_MESSAGE ${LOG_LEVEL_DEBUG} "
 alias TRACE="B_LOG_MESSAGE ${LOG_LEVEL_TRACE} "
