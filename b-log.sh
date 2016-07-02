@@ -25,7 +25,7 @@ readonly LOG_LEVEL_WARN=300     # warning conditions
 readonly LOG_LEVEL_INFO=400     # informational
 readonly LOG_LEVEL_DEBUG=500    # debug-level messages
 readonly LOG_LEVEL_TRACE=600    # see stack traces
-readonly LOG_LEVEL_ALL=700      # all enabled
+readonly LOG_LEVEL_ALL=-1       # all enabled
 
 #############################
 # Log template
@@ -44,7 +44,7 @@ readonly LOG_LEVEL_ALL=700      # all enabled
 # 4: line number
 # 5: log message
 # 6: space
-B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@5:2@][@3@:@4@] @5@" ) # default template
+B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@5:2@][@3@:@3:4@] @5@" ) # default template
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
@@ -93,28 +93,28 @@ function B_LOG(){
     function PRINT_USAGE() {
         # @description prints the short usage of the script
         echo ""
-        echo "Usage: command -hVo"
-        echo "-h --help help"
-        echo "-V --version version"
-        echo "-d --date-format 'date format' eg. '%Y-%m-%d %H:%M:%S.%N'"
-        echo "-o --stdout 'false/true' (default true)"
-        echo "-f --file 'file'"
-        echo "--file-prefix-enable enable the prefix for the log file"
-        echo "--file-prefix-disable disable the prefix for the log file"
-        echo "--file-suffix-enable enable the suffix for the log file"
-        echo "--file-suffix-disable disable the suffix for the log file"
-        echo "-s --syslog 'switches you want to use'."
-        echo " results in the command: 'logger switches log-message"
-        echo "-l --log-level the level of the log"
-        echo "  Log levels      : value"
-        echo " ---------------- : -----"
-        echo "  LOG_LEVEL_OFF   : ${LOG_LEVEL_OFF}"
-        echo "  LOG_LEVEL_FATAL : ${LOG_LEVEL_FATAL}"
-        echo "  LOG_LEVEL_ERROR : ${LOG_LEVEL_ERROR}"
-        echo "  LOG_LEVEL_WARN  : ${LOG_LEVEL_WARN}"
-        echo "  LOG_LEVEL_INFO  : ${LOG_LEVEL_INFO}"
-        echo "  LOG_LEVEL_DEBUG : ${LOG_LEVEL_DEBUG}"
-        echo "  LOG_LEVEL_TRACE : ${LOG_LEVEL_TRACE}"
+        echo "Usage: B_LOG [options]"
+        echo "  -h --help               Show usage"
+        echo "  -V --version            Version"
+        echo "  -d --date-format        Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'"
+        echo "  -o --stdout             Log over stdout (true/false) default true."
+        echo "  -f --file               File to log to, none set means disabled"
+        echo "  --file-prefix-enable    Enable the prefix for the log file"
+        echo "  --file-prefix-disable   Disable the prefix for the log file"
+        echo "  --file-suffix-enable    Enable the suffix for the log file"
+        echo "  --file-suffix-disable   Disable the suffix for the log file"
+        echo "  -s --syslog             'switches you want to use'. None set means disabled"
+        echo "                          results in: \"logger 'switches' log-message\""
+        echo "  -l --log-level          The log level"
+        echo "                          Log levels      : value"
+        echo "                          --------------- : -----"
+        echo "                          LOG_LEVEL_OFF   : ${LOG_LEVEL_OFF}"
+        echo "                          LOG_LEVEL_FATAL : ${LOG_LEVEL_FATAL}"
+        echo "                          LOG_LEVEL_ERROR : ${LOG_LEVEL_ERROR}"
+        echo "                          LOG_LEVEL_WARN  : ${LOG_LEVEL_WARN}"
+        echo "                          LOG_LEVEL_INFO  : ${LOG_LEVEL_INFO}"
+        echo "                          LOG_LEVEL_DEBUG : ${LOG_LEVEL_DEBUG}"
+        echo "                          LOG_LEVEL_TRACE : ${LOG_LEVEL_TRACE}"
         echo ""
     }
     for arg in "$@"; do # transform long options to short ones
@@ -291,8 +291,12 @@ function B_LOG_MESSAGE() {
     B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
     log_level=${1:-"$LOG_LEVEL_ERROR"}
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
-        return 0;
+        if [ ! ${LOG_LEVEL} -eq ${LOG_LEVEL_ALL} ]; then # check log level
+            return 0;
+        fi
     fi
+    # log level bigger as LOG_LEVEL? and level is not -1? return
+
     shift
     local message=${@:-}
     if [ -z "$message" ]; then # if message is empty, get from stdin
@@ -309,11 +313,11 @@ function B_LOG_MESSAGE() {
     fi
     # output to file
     if [ ! -z "${B_LOG_LOG_VIA_FILE}" ]; then
-        file_directory=${B_LOG_LOG_VIA_FILE%/*}
+        file_directory=$(dirname $B_LOG_LOG_VIA_FILE)
         if [ ! -z "${file_directory}" ]; then
             if [ ! -d "${B_LOG_LOG_VIA_FILE%/*}" ]; then # check directory
                 # directory does not exist
-                mkdir -p "${B_LOG_LOG_VIA_FILE%/*}" || err_ret_code=$?
+                mkdir -p "${file_directory}" || err_ret_code=$?
                 B_LOG_ERR "${err_ret_code}" "Error while making log directory: '${file_directory}'. Are the permissions ok?"
             fi
         fi
