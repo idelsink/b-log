@@ -31,39 +31,60 @@ readonly LOG_LEVEL_ALL=700      # all enabled
 # Log template
 #############################
 # template based on a number between '@x@'
+# so the following @a:b@ means:
+# a is the string length and b is the selector
+# or @a@ means:
+# a is the selector
 # so, @1@ will return the timestamp
+# and @5:1@ will return the timestamp of string length 5
+# selector: item
 # 1: timestamp
 # 2: log level name
 # 3: function name
 # 4: line number
 # 5: log message
 # 6: space
-B_LOG_DEFAULT_TEMPLATE=( "[@1@][@2@][@3@:@4@] @5@" ) # default template
+B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@5:2@][@3@:@4@] @5@" ) # default template
+# log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
     ${LOG_LEVEL_FATAL}  "FATAL" "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
     ${LOG_LEVEL_ERROR}  "ERROR" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
-    ${LOG_LEVEL_WARN}   "WARN " "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
-    ${LOG_LEVEL_INFO}   "INFO " "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
+    ${LOG_LEVEL_WARN}   "WARN"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
+    ${LOG_LEVEL_INFO}   "INFO"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
     ${LOG_LEVEL_DEBUG}  "DEBUG" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
     ${LOG_LEVEL_TRACE}  "TRACE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
 )
 # log levels columns
 readonly LOG_LEVELS_LEVEL=0
-readonly LOG_LEVELS_NAME=$((LOG_LEVELS_LEVEL+1))
-readonly LOG_LEVELS_TEMPLATE=$((LOG_LEVELS_NAME+1))
-readonly LOG_LEVELS_PREFIX=$((LOG_LEVELS_TEMPLATE+1))
-readonly LOG_LEVELS_SUFFIX=$((LOG_LEVELS_PREFIX+1))
+readonly LOG_LEVELS_NAME=1
+readonly LOG_LEVELS_TEMPLATE=2
+readonly LOG_LEVELS_PREFIX=3
+readonly LOG_LEVELS_SUFFIX=4
 
-LOG_LEVEL=${LOG_LEVEL_WARN} # current log level
+LOG_LEVEL=${LOG_LEVEL_WARN}     # current log level
 B_LOG_LOG_VIA_STDOUT=true       # log via stdout
 B_LOG_LOG_VIA_FILE=""           # file if logging via file (file, add suffix, add prefix)
-B_LOG_LOG_VIA_FILE_PREFIX=false
-B_LOG_LOG_VIA_FILE_SUFFIX=false
-B_LOG_LOG_VIA_SYSLOG=""           #
-B_LOG_TS=""                 # timestamp variable
-B_LOG_LOG_LEVEL_NAME=""     # the level name message
-B_LOG_LOG_MESSAGE=""        # the log message
+B_LOG_LOG_VIA_FILE_PREFIX=false # add prefix to log file
+B_LOG_LOG_VIA_FILE_SUFFIX=false # add suffix to log file
+B_LOG_LOG_VIA_SYSLOG=""         # syslog flags so that "syslog 'flags' message"
+B_LOG_TS=""                     # timestamp variable
+B_LOG_TS_FORMAT="%Y-%m-%d %H:%M:%S.%N" # timestamp format
+B_LOG_LOG_LEVEL_NAME=""         # the name of the log level
+B_LOG_LOG_MESSAGE=""            # the log message
+
+function B_LOG_ERR() {
+    # @description internal error message handler
+    # @param $1 return code of a command etc.
+    # @param $2 message when return code is 1
+    local return_code=${1:-0}
+    local return_message=${2:=""}
+    local prefix="\e[1;31m" # error color
+    local suffix="\e[0m"    # error color
+    if [ $return_code -eq 1 ]; then
+        echo -e "${prefix}${return_message}${suffix}"
+    fi
+}
 
 function B_LOG(){
     # @description setup interface
@@ -75,6 +96,7 @@ function B_LOG(){
         echo "Usage: command -hVo"
         echo "-h --help help"
         echo "-V --version version"
+        echo "-d --date-format 'date format' eg. '%Y-%m-%d %H:%M:%S.%N'"
         echo "-o --stdout 'false/true' (default true)"
         echo "-f --file 'file'"
         echo "--file-prefix-enable enable the prefix for the log file"
@@ -82,7 +104,7 @@ function B_LOG(){
         echo "--file-suffix-enable enable the suffix for the log file"
         echo "--file-suffix-disable disable the suffix for the log file"
         echo "-s --syslog 'switches you want to use'."
-        echo " results in the command 'logger switches log-message"
+        echo " results in the command: 'logger switches log-message"
         echo "-l --log-level the level of the log"
         echo "  Log levels      : value"
         echo " ---------------- : -----"
@@ -101,6 +123,7 @@ function B_LOG(){
             "--help") set -- "$@" "-h" ;;
             "--version") set -- "$@" "-V" ;;
             "--log-level") set -- "$@" "-l" ;;
+            "--date-format") set -- "$@" "-d" ;;
             "--stdout") set -- "$@" "-o" ;;
             "--file") set -- "$@" "-f" ;;
             "--file-prefix-enable") set -- "$@" "-a" "file-prefix-enable" ;;
@@ -112,7 +135,7 @@ function B_LOG(){
       esac
     done
     # get options
-    while getopts "hVo:f:s:l:a:" optname
+    while getopts "hVd:o:f:s:l:a:" optname
     do
         case "$optname" in
             "h")
@@ -120,6 +143,9 @@ function B_LOG(){
                 ;;
             "V")
                 echo "${B_LOG_APPNAME} v${B_LOG_VERSION}"
+                ;;
+            "d")
+                B_LOG_TS_FORMAT=${OPTARG}
                 ;;
             "o")
                 if [ "${OPTARG}" = true ]; then
@@ -156,8 +182,7 @@ function B_LOG(){
                 LOG_LEVEL=${OPTARG}
                 ;;
             *)
-                echo "unknown error while processing options"
-                exit 1;
+                B_LOG_ERR '1' "unknown error while processing B_LOG option."
             ;;
         esac
     done
@@ -194,14 +219,25 @@ function B_LOG_convert_template() {
     # @return fills a variable called 'B_LOG_CONVERTED_TEMPLATE_STRING'.
     local template=${@:-}
     local selector=0
+    local str_length=0
     local to_replace=""
     local log_layout_part=""
     local found_pattern=true
     B_LOG_CONVERTED_TEMPLATE_STRING=""
     while $found_pattern ; do
-        if [[ "${template}" =~  @[0-9]+@ ]]; then
+        if [[ "${template}" =~ @[0-9]+@ ]]; then
             to_replace=${BASH_REMATCH[0]}
             selector=${to_replace:1:(${#to_replace}-2)}
+        elif [[ "${template}" =~ @[0-9]+:[0-9]+@ ]]; then
+            to_replace=${BASH_REMATCH[0]}
+            if [[ "${to_replace}" =~ @[0-9]+: ]]; then
+                str_length=${BASH_REMATCH[0]:1:(${#BASH_REMATCH[0]}-2)}
+            else
+                str_length=0
+            fi
+            if [[ "${to_replace}" =~ :[0-9]+@ ]]; then
+                selector=${BASH_REMATCH[0]:1:(${#BASH_REMATCH[0]}-2)}
+            fi
         else
             found_pattern=false
         fi
@@ -225,27 +261,24 @@ function B_LOG_convert_template() {
                 log_layout_part=" "
                 ;;
             *)
-                echo "unknown template"
+                B_LOG_ERR '1' "unknown template parameter: '$selector'"
                 log_layout_part=""
             ;;
         esac
+        if [ ${str_length} -gt 0 ]; then # custom string length
+            if [ ${str_length} -lt ${#log_layout_part} ]; then
+                # smaller as string, truncate
+                log_layout_part=${log_layout_part:0:str_length}
+            elif [ ${str_length} -gt ${#log_layout_part} ]; then
+                # bigger as string, append
+                printf -v log_layout_part "%-0${str_length}s" $log_layout_part
+            fi
+        fi
+        str_length=0 # set default
         template="${template/$to_replace/$log_layout_part}"
     done
     B_LOG_CONVERTED_TEMPLATE_STRING=${template}
     return 0
-}
-
-function B_LOG_ERR() {
-    # @description internal error message handler
-    # @param $1 return code of a command etc.
-    # @param $2 message when return code is 1
-    local return_code=${1:-0}
-    local return_message=${2:=""}
-    local prefix="\e[1;31m" # error color
-    local suffix="\e[0m"    # error color
-    if [ $return_code -eq 1 ]; then
-        echo -e "${prefix}${return_message}${suffix}"
-    fi
 }
 
 function B_LOG_MESSAGE() {
@@ -255,8 +288,7 @@ function B_LOG_MESSAGE() {
     local file_directory=""
     local err_ret_code=0
     local err_ret_message=""
-    B_LOG_TS=$(date +'%Y-%m-%d %H:%M:%S.%N')
-    B_LOG_TS=${B_LOG_TS%??????}
+    B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
     log_level=${1:-"$LOG_LEVEL_ERROR"}
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
         return 0;
