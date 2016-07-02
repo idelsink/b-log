@@ -16,6 +16,7 @@ This library has the following features:
 ## Examples
 
 Some small examples to show the basic usage.
+For a simple complete example, see the [example.sh](./examples/example.sh) file.
 
 ### 01 Basic example
 
