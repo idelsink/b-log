@@ -234,21 +234,35 @@ function B_LOG_convert_template() {
     return 0
 }
 
+function B_LOG_ERR() {
+    # @description internal error message handler
+    # @param $1 return code of a command etc.
+    # @param $2 message when return code is 1
+    local return_code=${1:-0}
+    local return_message=${2:=""}
+    local prefix="\e[1;31m" # error color
+    local suffix="\e[0m"    # error color
+    if [ $return_code -eq 1 ]; then
+        echo -e "${prefix}${return_message}${suffix}"
+    fi
+}
+
 function B_LOG_MESSAGE() {
     # @description
     # @param $1 log type
     # $2... the rest are messages
+    local file_directory=""
+    local err_ret_code=0
+    local err_ret_message=""
     B_LOG_TS=$(date +'%Y-%m-%d %H:%M:%S.%N')
     B_LOG_TS=${B_LOG_TS%??????}
     log_level=${1:-"$LOG_LEVEL_ERROR"}
-    # check log level
-    if [ ${log_level} -gt ${LOG_LEVEL} ]; then
+    if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
         return 0;
     fi
     shift
     local message=${@:-}
-    # if message is empty, get from stdin
-    if [ -z "$message" ]; then
+    if [ -z "$message" ]; then # if message is empty, get from stdin
         message="$(cat /dev/stdin)"
     fi
     B_LOG_LOG_MESSAGE="${message}"
@@ -262,24 +276,30 @@ function B_LOG_MESSAGE() {
     fi
     # output to file
     if [ ! -z "${B_LOG_LOG_VIA_FILE}" ]; then
-        if [ ! -d "${B_LOG_LOG_VIA_FILE%/*}" ]; then
-            # directory does not exist
-            mkdir -p "${B_LOG_LOG_VIA_FILE%/*}" || true
-        else
-            if [ ! -e "${B_LOG_LOG_VIA_FILE}" ]; then
-                # file does not exist
-                touch "${B_LOG_LOG_VIA_FILE}" || true
-            else
-                message=""
-                if [ "${B_LOG_LOG_VIA_FILE_PREFIX}" = true ]; then
-                    message="${message}${LOG_PREFIX}"
-                fi
-                message="${message}${B_LOG_CONVERTED_TEMPLATE_STRING}"
-                if [ "${B_LOG_LOG_VIA_FILE_SUFFIX}" = true ]; then
-                    message="${message}${LOG_SUFFIX}"
-                fi
-                echo -e "${message}" >> ${B_LOG_LOG_VIA_FILE} || true
+        file_directory=${B_LOG_LOG_VIA_FILE%/*}
+        if [ ! -z "${file_directory}" ]; then
+            if [ ! -d "${B_LOG_LOG_VIA_FILE%/*}" ]; then # check directory
+                # directory does not exist
+                mkdir -p "${B_LOG_LOG_VIA_FILE%/*}" || err_ret_code=$?
+                B_LOG_ERR "${err_ret_code}" "Error while making log directory: '${file_directory}'. Are the permissions ok?"
             fi
+        fi
+        if [ ! -e "${B_LOG_LOG_VIA_FILE}" ]; then # check file
+            # file does not exist and making of folder went ok
+            if [ $err_ret_code -ne 1 ]; then
+                touch "${B_LOG_LOG_VIA_FILE}" || err_ret_code=$?
+                B_LOG_ERR "${err_ret_code}" "Error while making log file: '${B_LOG_LOG_VIA_FILE}'. Are the permissions ok?"
+            fi
+        else
+            message=""
+            if [ "${B_LOG_LOG_VIA_FILE_PREFIX}" = true ]; then
+                message="${message}${LOG_PREFIX}"
+            fi
+            message="${message}${B_LOG_CONVERTED_TEMPLATE_STRING}"
+            if [ "${B_LOG_LOG_VIA_FILE_SUFFIX}" = true ]; then
+                message="${message}${LOG_SUFFIX}"
+            fi
+            echo -e "${message}" >> ${B_LOG_LOG_VIA_FILE} || true
         fi
     fi
     # output to syslog
