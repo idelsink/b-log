@@ -7,8 +7,9 @@ B_LOG --syslog '--tag b-log_example_02'
 FATAL   "fatal level"
 ERROR   "error level"
 WARN    "warning level"
+NOTICE  "notice level"
 INFO    "info level"
 DEBUG   "debug level"
 TRACE   "trace level"
-echo "Printing the tail of '/var/log/syslog'"
-tail -n 5 /var/log/syslog
+echo "Printing the tail of last 7 messages '/var/log/syslog'"
+tail -n 7 /var/log/syslog

@@ -13,11 +13,11 @@ This library has the following features:
 -   custom error levels
 -   piping of error messages
 
-## Usage
+## Examples
 
-### Demo
+Some small examples to show the basic usage.
 
-#### 01 Basic example
+### 01 Basic example
 
 See [this](./examples/01_basic_example.sh) file.
 
@@ -32,7 +32,10 @@ DEBUG   "debug level"
 TRACE   "trace level"
 ```
 
-#### 02 Log to file and syslog
+Terminal output:  
+![Example 01](/examples/01_basic_example.png "Example 01 output")
+
+### 02 Log to file and syslog
 
 See [this](./examples/02_log_to_file_and_syslog.sh) file.
 
@@ -51,7 +54,10 @@ echo "Printing the tail of '/var/log/syslog'"
 tail -n 5 /var/log/syslog
 ```
 
-#### 03 Custom template
+Terminal output:  
+![Example 02](/examples/02_log_to_file_and_syslog.png "Example 02 output")
+
+### 03 Custom template
 
 See [this](./examples/03_custom_log_level_and_template.sh) file.
 
@@ -74,6 +80,11 @@ LOG_LEVELS+=("50" "EXAMPLE" "@12:1@ @2@ [@5@]" "\e[37m" "\e[0m") # add custom lo
 B_LOG_MESSAGE 50 "example log message"
 WARN "all the normal levels still work, with the new date-format of course"
 ```
+
+Terminal output:  
+![Example 03](/examples/03_custom_level_and_template.png "Example 03 output")
+
+## Usage
 
 ### Include in script
 
@@ -101,15 +112,16 @@ Usage: B_LOG [options]
   -s --syslog             'switches you want to use'. None set means disabled
                           results in: "logger 'switches' log-message"
   -l --log-level          The log level
-                          Log levels      : value
-                          --------------- : -----
-                          LOG_LEVEL_OFF   : 0
-                          LOG_LEVEL_FATAL : 100
-                          LOG_LEVEL_ERROR : 200
-                          LOG_LEVEL_WARN  : 300
-                          LOG_LEVEL_INFO  : 400
-                          LOG_LEVEL_DEBUG : 500
-                          LOG_LEVEL_TRACE : 600
+                          Log levels       : value
+                          ---------------- : -----
+                          LOG_LEVEL_OFF    : 0
+                          LOG_LEVEL_FATAL  : 100
+                          LOG_LEVEL_ERROR  : 200
+                          LOG_LEVEL_WARN   : 300
+                          LOG_LEVEL_NOTICE : 400
+                          LOG_LEVEL_INFO   : 500
+                          LOG_LEVEL_DEBUG  : 600
+                          LOG_LEVEL_TRACE  : 700
 ```
 
 #### Log level
@@ -247,7 +259,7 @@ All log levels are stored in an array with the following layout:
 To add a log level, do the following:
 
 ```sh
-# add level with number 50, name EXAMPLE, default template and colors like INFO
+# add level with number 50, name EXAMPLE, default template and colors like WARN
 LOG_LEVELS+=("50" "EXAMPLE" "[@23:1@][@5:2@][@3@:@3:4@] @5@" "\e[37m" "\e[0m")
 # or
 LOG_LEVELS+=("50" "EXAMPLE" "$B_LOG_DEFAULT_TEMPLATE" "\e[37m" "\e[0m")
