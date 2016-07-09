@@ -9,13 +9,13 @@
 # pronounced as 'bee log' or 'blog'... whatever you like.
 #########################################################################
 # include guard
-[ -n "$B_LOG_SH" ] && return || readonly B_LOG_SH=1
+[ -n "${B_LOG_SH+x}" ] && return || readonly B_LOG_SH=1
 
 # global parameters
 # default disable these settings
-#set -e          # kill script if a command fails
-#set -o nounset  # unset values give error
-#set -o pipefail # prevents errors in a pipeline from being masked
+set -e          # kill script if a command fails
+set -o nounset  # unset values give error
+set -o pipefail # prevents errors in a pipeline from being masked
 
 B_LOG_VERSION=1.0.0
 B_LOG_APPNAME="b-log"
