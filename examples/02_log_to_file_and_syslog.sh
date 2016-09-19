@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # example: 02 - log to file and syslog
 source ${0%/*}/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all

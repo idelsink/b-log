@@ -63,7 +63,7 @@ Terminal output:
 See [this](./examples/03_custom_log_level_and_template.sh) file.
 
 ```sh
-#!/bin/bash
+#!/usr/bin/env bash
 source ${0%/*}/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 FATAL   "fatal level"

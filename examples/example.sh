@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #########################################################################
 # Script Name: example
 # Script Version: 0.0.1

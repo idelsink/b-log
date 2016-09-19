@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #########################################################################
 # Script Name: b-log
 # Script Version: 1.0.0
