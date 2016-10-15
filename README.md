@@ -222,12 +222,14 @@ This can be done in two formats:
 `l` is the length of the string of the selected item.
 If this is not set, the length that is needed for the string is used.
 
-1.  timestamp
+The following parameters are supported at this moment:
+
+1.  time-stamp (this uses the date-format that can be customized via the `--date-format` parameter)
 2.  log level name
 3.  function name
 4.  line number
 5.  log message
-6.  space
+6.  space character
 
 The default template used, that is stored in `B_LOG_DEFAULT_TEMPLATE`, is:  
 `[@23:1@][@5:2@][@3@:@3:4@] @5@`
