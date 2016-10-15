@@ -11,8 +11,8 @@ set -e          # kill script if a command fails
 set -o nounset  # unset values give error
 set -o pipefail # prevents errors in a pipeline from being masked
 
-script_path=${0%/*}                 # the path to the script
-source ${script_path}/../b-log.sh   # include the log script
+script_path=$(dirname $( realpath ${BASH_SOURCE[0]} ) ) # the path to the script
+source ${script_path}/../b-log.sh                       # include the log script
 
 echo "--------------------------------------------------"
 echo "Example of"

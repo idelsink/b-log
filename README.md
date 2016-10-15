@@ -23,7 +23,7 @@ For a simple complete example, see the [example.sh](./examples/example.sh) file.
 See [this](./examples/01_basic_example.sh) file.
 
 ```sh
-source ${0%/*}/../b-log.sh  # include the script
+source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 FATAL   "fatal level"
 ERROR   "error level"
@@ -41,7 +41,7 @@ Terminal output:
 See [this](./examples/02_log_to_file_and_syslog.sh) file.
 
 ```sh
-source ${0%/*}/../b-log.sh  # include the script
+source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 B_LOG --file log.txt --file-prefix-enable --file-suffix-enable
 B_LOG --syslog '--tag b-log_example_02'
@@ -64,7 +64,7 @@ See [this](./examples/03_custom_log_level_and_template.sh) file.
 
 ```sh
 #!/usr/bin/env bash
-source ${0%/*}/../b-log.sh  # include the script
+source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 FATAL   "fatal level"
 ERROR   "error level"
