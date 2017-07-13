@@ -353,23 +353,54 @@ function B_LOG_MESSAGE() {
     fi
 }
 
-# set alias for log level command
-shopt -s expand_aliases
-alias LOG_LEVEL_OFF="B_LOG --log-level ${LOG_LEVEL_OFF}"
-alias LOG_LEVEL_FATAL="B_LOG --log-level ${LOG_LEVEL_FATAL}"
-alias LOG_LEVEL_ERROR="B_LOG --log-level ${LOG_LEVEL_ERROR}"
-alias LOG_LEVEL_WARN="B_LOG --log-level ${LOG_LEVEL_WARN}"
-alias LOG_LEVEL_NOTICE="B_LOG --log-level ${LOG_LEVEL_NOTICE}"
-alias LOG_LEVEL_INFO="B_LOG --log-level ${LOG_LEVEL_INFO}"
-alias LOG_LEVEL_DEBUG="B_LOG --log-level ${LOG_LEVEL_DEBUG}"
-alias LOG_LEVEL_TRACE="B_LOG --log-level ${LOG_LEVEL_TRACE}"
-alias LOG_LEVEL_ALL="B_LOG --log-level ${LOG_LEVEL_ALL}"
+# use  function to define command
+LOG_LEVEL_OFF() {
+  B_LOG --log-level ${LOG_LEVEL_OFF} $@
+}
+LOG_LEVEL_FATAL() {
+  B_LOG --log-level ${LOG_LEVEL_FATAL} $@
+}
+LOG_LEVEL_ERROR() {
+  B_LOG --log-level ${LOG_LEVEL_ERROR} $@
+}
+LOG_LEVEL_WARN() {
+  B_LOG --log-level ${LOG_LEVEL_WARN} $@
+}
+LOG_LEVEL_NOTICE() {
+  B_LOG --log-level ${LOG_LEVEL_NOTICE} $@
+}
+LOG_LEVEL_INFO() {
+  B_LOG --log-level ${LOG_LEVEL_INFO} $@
+}
+LOG_LEVEL_DEBUG() {
+  B_LOG --log-level ${LOG_LEVEL_DEBUG} $@
+}
+LOG_LEVEL_TRACE() {
+  B_LOG --log-level ${LOG_LEVEL_TRACE} $@
+}
+LOG_LEVEL_ALL() {
+  B_LOG --log-level ${LOG_LEVEL_ALL} $@
+}
 
 # set alias for log command
-alias FATAL="B_LOG_MESSAGE ${LOG_LEVEL_FATAL} "
-alias ERROR="B_LOG_MESSAGE ${LOG_LEVEL_ERROR} "
-alias WARN="B_LOG_MESSAGE ${LOG_LEVEL_WARN} "
-alias NOTICE="B_LOG_MESSAGE ${LOG_LEVEL_NOTICE} "
-alias INFO="B_LOG_MESSAGE ${LOG_LEVEL_INFO} "
-alias DEBUG="B_LOG_MESSAGE ${LOG_LEVEL_DEBUG} "
-alias TRACE="B_LOG_MESSAGE ${LOG_LEVEL_TRACE} "
+FATAL() {
+  B_LOG_MESSAGE ${LOG_LEVEL_FATAL}  $@
+}
+ERROR() {
+  B_LOG_MESSAGE ${LOG_LEVEL_ERROR}  $@
+}
+WARN() {
+  B_LOG_MESSAGE ${LOG_LEVEL_WARN}  $@
+}
+NOTICE() {
+  B_LOG_MESSAGE ${LOG_LEVEL_NOTICE}  $@
+}
+INFO() {
+  B_LOG_MESSAGE ${LOG_LEVEL_INFO}  $@
+}
+DEBUG() {
+  B_LOG_MESSAGE ${LOG_LEVEL_DEBUG}  $@
+}
+TRACE() {
+  B_LOG_MESSAGE ${LOG_LEVEL_TRACE} $@
+}
