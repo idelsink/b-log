@@ -49,7 +49,7 @@ readonly LOG_LEVEL_ALL=-1       # all enabled
 # 4: line number
 # 5: log message
 # 6: space
-B_LOG_DEFAULT_TEMPLATE=( "[@23:1@][@6:2@][@3@:@3:4@] @5@" ) # default template
+B_LOG_DEFAULT_TEMPLATE="[@23:1@][@6:2@][@3@:@3:4@] @5@"  # default template
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
@@ -224,7 +224,7 @@ function B_LOG_convert_template() {
     # @description converts the template to a usable string
     # only call this after filling the global parameters
     # @return fills a variable called 'B_LOG_CONVERTED_TEMPLATE_STRING'.
-    local template=${@:-}
+    local template=${*:-}
     local selector=0
     local str_length=0
     local to_replace=""
@@ -294,7 +294,6 @@ function B_LOG_MESSAGE() {
     # $2... the rest are messages
     local file_directory=""
     local err_ret_code=0
-    local err_ret_message=""
     B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
     log_level=${1:-"$LOG_LEVEL_ERROR"}
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
@@ -305,7 +304,7 @@ function B_LOG_MESSAGE() {
     # log level bigger as LOG_LEVEL? and level is not -1? return
 
     shift
-    local message=${@:-}
+    local message=${*:-}
     if [ -z "$message" ]; then # if message is empty, get from stdin
         message="$(cat /dev/stdin)"
     fi
@@ -353,54 +352,23 @@ function B_LOG_MESSAGE() {
     fi
 }
 
-# use  function to define command
-LOG_LEVEL_OFF() {
-  B_LOG --log-level ${LOG_LEVEL_OFF} $@
-}
-LOG_LEVEL_FATAL() {
-  B_LOG --log-level ${LOG_LEVEL_FATAL} $@
-}
-LOG_LEVEL_ERROR() {
-  B_LOG --log-level ${LOG_LEVEL_ERROR} $@
-}
-LOG_LEVEL_WARN() {
-  B_LOG --log-level ${LOG_LEVEL_WARN} $@
-}
-LOG_LEVEL_NOTICE() {
-  B_LOG --log-level ${LOG_LEVEL_NOTICE} $@
-}
-LOG_LEVEL_INFO() {
-  B_LOG --log-level ${LOG_LEVEL_INFO} $@
-}
-LOG_LEVEL_DEBUG() {
-  B_LOG --log-level ${LOG_LEVEL_DEBUG} $@
-}
-LOG_LEVEL_TRACE() {
-  B_LOG --log-level ${LOG_LEVEL_TRACE} $@
-}
-LOG_LEVEL_ALL() {
-  B_LOG --log-level ${LOG_LEVEL_ALL} $@
-}
+# Define commands
+# Setting of log level
+function LOG_LEVEL_OFF()    { B_LOG --log-level ${LOG_LEVEL_OFF} "$@"; }
+function LOG_LEVEL_FATAL()  { B_LOG --log-level ${LOG_LEVEL_FATAL} "$@"; }
+function LOG_LEVEL_ERROR()  { B_LOG --log-level ${LOG_LEVEL_ERROR} "$@"; }
+function LOG_LEVEL_WARN()   { B_LOG --log-level ${LOG_LEVEL_WARN} "$@"; }
+function LOG_LEVEL_NOTICE() { B_LOG --log-level ${LOG_LEVEL_NOTICE} "$@"; }
+function LOG_LEVEL_INFO()   { B_LOG --log-level ${LOG_LEVEL_INFO} "$@"; }
+function LOG_LEVEL_DEBUG()  { B_LOG --log-level ${LOG_LEVEL_DEBUG} "$@"; }
+function LOG_LEVEL_TRACE()  { B_LOG --log-level ${LOG_LEVEL_TRACE} "$@"; }
+function LOG_LEVEL_ALL()    { B_LOG --log-level ${LOG_LEVEL_ALL} "$@"; }
 
-# set alias for log command
-FATAL() {
-  B_LOG_MESSAGE ${LOG_LEVEL_FATAL}  $@
-}
-ERROR() {
-  B_LOG_MESSAGE ${LOG_LEVEL_ERROR}  $@
-}
-WARN() {
-  B_LOG_MESSAGE ${LOG_LEVEL_WARN}  $@
-}
-NOTICE() {
-  B_LOG_MESSAGE ${LOG_LEVEL_NOTICE}  $@
-}
-INFO() {
-  B_LOG_MESSAGE ${LOG_LEVEL_INFO}  $@
-}
-DEBUG() {
-  B_LOG_MESSAGE ${LOG_LEVEL_DEBUG}  $@
-}
-TRACE() {
-  B_LOG_MESSAGE ${LOG_LEVEL_TRACE} $@
-}
+# Log commands
+function FATAL()    { B_LOG_MESSAGE ${LOG_LEVEL_FATAL} "$@"; }
+function ERROR()    { B_LOG_MESSAGE ${LOG_LEVEL_ERROR} "$@"; }
+function WARN()     { B_LOG_MESSAGE ${LOG_LEVEL_WARN} "$@"; }
+function NOTICE()   { B_LOG_MESSAGE ${LOG_LEVEL_NOTICE} "$@"; }
+function INFO()     { B_LOG_MESSAGE ${LOG_LEVEL_INFO} "$@"; }
+function DEBUG()    { B_LOG_MESSAGE ${LOG_LEVEL_DEBUG} "$@"; }
+function TRACE()    { B_LOG_MESSAGE ${LOG_LEVEL_TRACE} "$@"; }
