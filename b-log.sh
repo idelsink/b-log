@@ -17,8 +17,8 @@
 #set -o nounset  # unset values give error
 #set -o pipefail # prevents errors in a pipeline from being masked
 
-B_LOG_VERSION=1.0.0
 B_LOG_APPNAME="b-log"
+B_LOG_VERSION=1.1.0
 
 # --- global variables ----------------------------------------------
 # log levels
@@ -100,18 +100,18 @@ function B_LOG(){
         # @description prints the short usage of the script
         echo ""
         echo "Usage: B_LOG [options]"
-        echo "  -h --help               Show usage"
-        echo "  -V --version            Version"
-        echo "  -d --date-format        Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'"
-        echo "  -o --stdout             Log over stdout (true/false) default true."
-        echo "  -f --file               File to log to, none set means disabled"
+        echo "  -h, --help              Show usage"
+        echo "  -V, --version           Version"
+        echo "  -d, --date-format       Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'"
+        echo "  -o, --stdout            Log over stdout (true/false) default true."
+        echo "  -f, --file              File to log to, none set means disabled"
         echo "  --file-prefix-enable    Enable the prefix for the log file"
         echo "  --file-prefix-disable   Disable the prefix for the log file"
         echo "  --file-suffix-enable    Enable the suffix for the log file"
         echo "  --file-suffix-disable   Disable the suffix for the log file"
-        echo "  -s --syslog             'switches you want to use'. None set means disabled"
+        echo "  -s, --syslog            'switches you want to use'. None set means disabled"
         echo "                          results in: \"logger 'switches' log-message\""
-        echo "  -l --log-level          The log level"
+        echo "  -l, --log-level         The log level"
         echo "                          Log levels       : value"
         echo "                          ---------------- : -----"
         echo "                          LOG_LEVEL_OFF    : ${LOG_LEVEL_OFF}"
