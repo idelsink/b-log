@@ -22,12 +22,15 @@ For a simple complete example, see the [example.sh](./examples/example.sh) file.
 
 See [this](./examples/01_basic_example.sh) file.
 
-```sh
-source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
+```bash
+#!/usr/bin/env bash
+# example: 01 - basic example
+source "$(dirname "$( realpath ${BASH_SOURCE[0]} )" )"/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 FATAL   "fatal level"
 ERROR   "error level"
 WARN    "warning level"
+NOTICE  "notice level"
 INFO    "info level"
 DEBUG   "debug level"
 TRACE   "trace level"
@@ -40,19 +43,22 @@ Terminal output:
 
 See [this](./examples/02_log_to_file_and_syslog.sh) file.
 
-```sh
-source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
+```bash
+#!/usr/bin/env bash
+# example: 02 - log to file and syslog
+source "$(dirname "$( realpath ${BASH_SOURCE[0]} )" )"/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 B_LOG --file log.txt --file-prefix-enable --file-suffix-enable
 B_LOG --syslog '--tag b-log_example_02'
 FATAL   "fatal level"
 ERROR   "error level"
 WARN    "warning level"
+NOTICE  "notice level"
 INFO    "info level"
 DEBUG   "debug level"
 TRACE   "trace level"
-echo "Printing the tail of '/var/log/syslog'"
-tail -n 5 /var/log/syslog
+echo "Printing the tail of last 7 messages '/var/log/syslog'"
+tail -n 7 /var/log/syslog
 ```
 
 Terminal output:  
@@ -60,15 +66,17 @@ Terminal output:
 
 ### 03 Custom template
 
-See [this](./examples/03_custom_log_level_and_template.sh) file.
+See [this](./examples/03_custom_level_and_template.sh) file.
 
-```sh
+```bash
 #!/usr/bin/env bash
-source $(dirname $( realpath ${BASH_SOURCE[0]} ) )/../b-log.sh  # include the script
+# example: 03 - custom log level and template
+source "$(dirname "$( realpath ${BASH_SOURCE[0]} )" )"/../b-log.sh  # include the script
 LOG_LEVEL_ALL               # set log level to all
 FATAL   "fatal level"
 ERROR   "error level"
 WARN    "warning level"
+NOTICE  "notice level"
 INFO    "info level"
 DEBUG   "debug level"
 TRACE   "trace level"
@@ -89,9 +97,9 @@ Terminal output:
 
 ### Include in script
 
-```sh
-# relative include b-log
-source ${0%/*}/../b-log.sh
+```bash
+# relative include b-log from file
+source "$(dirname "$( realpath ${BASH_SOURCE[0]} )" )"/<relative path to b-log>/b-log.sh
 ```
 
 ### Parameters
@@ -100,19 +108,22 @@ The `B_LOG` function, acts like the script interface.
 From here all the parameters can be set.
 
 ```text
+Example of
+b-log v1.1.0
+
 Usage: B_LOG [options]
-  -h --help               Show usage
-  -V --version            Version
-  -d --date-format        Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'
-  -o --stdout             Log over stdout (true/false) default true.
-  -f --file               File to log to, none set means disabled
+  -h, --help              Show usage
+  -V, --version           Version
+  -d, --date-format       Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'
+  -o, --stdout            Log over stdout (true/false) default true.
+  -f, --file              File to log to, none set means disabled
   --file-prefix-enable    Enable the prefix for the log file
   --file-prefix-disable   Disable the prefix for the log file
   --file-suffix-enable    Enable the suffix for the log file
   --file-suffix-disable   Disable the suffix for the log file
-  -s --syslog             'switches you want to use'. None set means disabled
+  -s, --syslog            'switches you want to use'. None set means disabled
                           results in: "logger 'switches' log-message"
-  -l --log-level          The log level
+  -l, --log-level         The log level
                           Log levels       : value
                           ---------------- : -----
                           LOG_LEVEL_OFF    : 0
@@ -129,23 +140,23 @@ Usage: B_LOG [options]
 
 Setting the log level can be accomplished in three different ways.  
 First via a simple integer value, second via the available parameters
-and last via an alias.
+and last via a function.
 
-```sh
-# log level OFF
+```bash
+# Log level OFF
 B_LOG --log-level 0
-# log level FATAL
+# Log level FATAL
 B_LOG --log-level $LOG_LEVEL_FATAL
-# log level ERROR
-LOG_LEVEL_ERROR # internally aliased to B_LOG --log-level $LOG_LEVEL_ERROR
+# Log level ERROR
+LOG_LEVEL_ERROR # Internal call to B_LOG --log-level $LOG_LEVEL_ERROR
 ```
 
 #### Logging
 
 Logging can be done via two ways.  
-First there are the predefined aliases:
+First there are the predefined functions:
 
-```sh
+```bash
 FATAL "fatal level"
 ERROR "error level"
 WARN "warning level"
@@ -154,19 +165,19 @@ DEBUG "debug level"
 TRACE "trace level"
 ```
 
-Second the underlying function that is called via those aliases:
+Second the underlying generic functions that is called:
 
-```sh
+```bash
 B_LOG_MESSAGE error_level "message"     # error_level is the integer value
 B_LOG_MESSAGE LOG_LEVEL_INFO "message"  # send message to INFO
-B_LOG_MESSAGE 400 "message"             # 100 is the value of LOG_LEVEL_INFO
+B_LOG_MESSAGE 400 "message"             # 400 is the value of LOG_LEVEL_INFO
 ```
 
 The `B_LOG_MESSAGE` function, which is used to log messages,
 can also read from stdin.  
 For example:
 
-```sh
+```bash
 echo "piped into INFO" | INFO
 echo "piped into INFO" | B_LOG_MESSAGE $LOG_LEVEL_INFO
 echo "piped into INFO" | B_LOG_MESSAGE 400
@@ -177,7 +188,7 @@ echo "piped into INFO" | B_LOG_MESSAGE 400
 Stdout is the standard output used. by default this is enabled.
 To enable or disable this use the following commands:
 
-```sh
+```bash
 B_LOG --stdout true # enable logging over stdout
 B_LOG --stdout false # disable logging over stdout
 ```
@@ -187,7 +198,7 @@ B_LOG --stdout false # disable logging over stdout
 By default, logging to a file is disabled.
 To enable this, use the following commands:
 
-```sh
+```bash
 B_LOG --file log/log.txt # logs to a file called log.txt
 # enable the prefix and suffix, these contain the color formats
 B_LOG --file-prefix-enable --file-suffix-enable
@@ -196,9 +207,9 @@ B_LOG --file-prefix-enable --file-suffix-enable
 #### Logging via the syslog
 
 Logging via the linux `logger` command can be handy in some cases.
-To enable use the following:
+To enable, use the following:
 
-```sh
+```bash
 # this will log all the messages to the '/var/log/syslog' with tag 'b-log'
 # for all the parameters available see the man page of logger. 'man logger'
 B_LOG --syslog '--tag b-log'
@@ -206,7 +217,7 @@ B_LOG --syslog '--tag b-log'
 
 As demonstrated the underlying code will simply call the `logger` command with
 the settings as the parameters to the command.  
-Eg. `logger parameters log-message`
+Eg. `logger parameters log-message`.
 
 ### Templates
 
@@ -261,14 +272,14 @@ All log levels are stored in an array with the following layout:
 
 To add a log level, do the following:
 
-```sh
+```bash
 # add level with number 50, name EXAMPLE, default template and colors like WARN
 LOG_LEVELS+=("50" "EXAMPLE" "[@23:1@][@5:2@][@3@:@3:4@] @5@" "\e[37m" "\e[0m")
 # or
 LOG_LEVELS+=("50" "EXAMPLE" "$B_LOG_DEFAULT_TEMPLATE" "\e[37m" "\e[0m")
 ```
 
-See also [this](./examples/03_custom_log_level_and_template.sh) example file.
+See also [this](./examples/03_custom_level_and_template.sh) example file.
 
 ## License
 
