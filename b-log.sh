@@ -256,10 +256,10 @@ function B_LOG_convert_template() {
                 log_layout_part="${B_LOG_LOG_LEVEL_NAME}"
                 ;;
             3) # function name
-                log_layout_part="${FUNCNAME[2]}"
+                log_layout_part="${FUNCNAME[3]}"
                 ;;
             4) # line number
-                log_layout_part="${BASH_LINENO[1]}"
+                log_layout_part="${BASH_LINENO[2]}"
                 ;;
             5) # message
                 log_layout_part="${B_LOG_LOG_MESSAGE}"
