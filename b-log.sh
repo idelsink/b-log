@@ -49,7 +49,9 @@ readonly LOG_LEVEL_ALL=-1       # all enabled
 # 4: line number
 # 5: log message
 # 6: space
+# 7: filename
 B_LOG_DEFAULT_TEMPLATE="[@23:1@][@6:2@][@3@:@3:4@] @5@"  # default template
+
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
@@ -266,6 +268,9 @@ function B_LOG_convert_template() {
                 ;;
             6) # space
                 log_layout_part=" "
+                ;;
+            7) # file name
+                log_layout_part="$(echo ${BASH_SOURCE[3]} | rev | cut -d'/' -f1 | rev)"
                 ;;
             *)
                 B_LOG_ERR '1' "unknown template parameter: '$selector'"

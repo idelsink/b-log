@@ -241,6 +241,7 @@ The following parameters are supported at this moment:
 4.  line number
 5.  log message
 6.  space character
+7.  filename
 
 The default template used, that is stored in `B_LOG_DEFAULT_TEMPLATE`, is:  
 `[@23:1@][@5:2@][@3@:@3:4@] @5@`
