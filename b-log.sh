@@ -270,7 +270,7 @@ function B_LOG_convert_template() {
                 log_layout_part=" "
                 ;;
             7) # file name
-                log_layout_part="$(basename ${BASH_SOURCE[3]})"
+                log_layout_part="$(basename ${BASH_SOURCE[2]})"
                 ;;
             *)
                 B_LOG_ERR '1' "unknown template parameter: '$selector'"
