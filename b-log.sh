@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #########################################################################
 # Script Name: b-log
-# Script Version: 1.0.0
+# Script Version: See B_LOG_VERSION
 # Script Date: 30 June 2016
 #########################################################################
 #
@@ -18,7 +18,7 @@
 #set -o pipefail # prevents errors in a pipeline from being masked
 
 B_LOG_APPNAME="b-log"
-B_LOG_VERSION=1.1.0
+B_LOG_VERSION=1.2.0
 
 # --- global variables ----------------------------------------------
 # log levels

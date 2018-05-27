@@ -109,7 +109,7 @@ From here all the parameters can be set.
 
 ```text
 Example of
-b-log v1.1.0
+b-log v1.2.0
 
 Usage: B_LOG [options]
   -h, --help              Show usage
