@@ -55,13 +55,13 @@ B_LOG_DEFAULT_TEMPLATE="[@23:1@][@6:2@][@3@:@3:4@] @5@"  # default template
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
-    ${LOG_LEVEL_FATAL}  "FATAL"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
-    ${LOG_LEVEL_ERROR}  "ERROR"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
-    ${LOG_LEVEL_WARN}   "WARN"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
-    ${LOG_LEVEL_NOTICE} "NOTICE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;32m" "\e[0m"
-    ${LOG_LEVEL_INFO}   "INFO"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
-    ${LOG_LEVEL_DEBUG}  "DEBUG"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
-    ${LOG_LEVEL_TRACE}  "TRACE"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
+    "${LOG_LEVEL_FATAL}"  "FATAL"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
+    "${LOG_LEVEL_ERROR}"  "ERROR"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
+    "${LOG_LEVEL_WARN}"   "WARN"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
+    "${LOG_LEVEL_NOTICE}" "NOTICE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;32m" "\e[0m"
+    "${LOG_LEVEL_INFO}"   "INFO"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
+    "${LOG_LEVEL_DEBUG}"  "DEBUG"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
+    "${LOG_LEVEL_TRACE}"  "TRACE"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
 )
 # log levels columns
 readonly LOG_LEVELS_LEVEL=0
@@ -293,7 +293,7 @@ function B_LOG_convert_template() {
     return 0
 }
 
-function B_LOG_MESSAGE() {
+function B_LOG_print_message() {
     # @description
     # @param $1 log type
     # $2... the rest are messages
@@ -370,10 +370,12 @@ function LOG_LEVEL_TRACE()  { B_LOG --log-level ${LOG_LEVEL_TRACE} "$@"; }
 function LOG_LEVEL_ALL()    { B_LOG --log-level ${LOG_LEVEL_ALL} "$@"; }
 
 # Log commands
-function FATAL()    { B_LOG_MESSAGE ${LOG_LEVEL_FATAL} "$@"; }
-function ERROR()    { B_LOG_MESSAGE ${LOG_LEVEL_ERROR} "$@"; }
-function WARN()     { B_LOG_MESSAGE ${LOG_LEVEL_WARN} "$@"; }
-function NOTICE()   { B_LOG_MESSAGE ${LOG_LEVEL_NOTICE} "$@"; }
-function INFO()     { B_LOG_MESSAGE ${LOG_LEVEL_INFO} "$@"; }
-function DEBUG()    { B_LOG_MESSAGE ${LOG_LEVEL_DEBUG} "$@"; }
-function TRACE()    { B_LOG_MESSAGE ${LOG_LEVEL_TRACE} "$@"; }
+function B_LOG_MESSAGE() { B_LOG_print_message "$@"; }
+
+function FATAL()    { B_LOG_print_message ${LOG_LEVEL_FATAL} "$@"; }
+function ERROR()    { B_LOG_print_message ${LOG_LEVEL_ERROR} "$@"; }
+function WARN()     { B_LOG_print_message ${LOG_LEVEL_WARN} "$@"; }
+function NOTICE()   { B_LOG_print_message ${LOG_LEVEL_NOTICE} "$@"; }
+function INFO()     { B_LOG_print_message ${LOG_LEVEL_INFO} "$@"; }
+function DEBUG()    { B_LOG_print_message ${LOG_LEVEL_DEBUG} "$@"; }
+function TRACE()    { B_LOG_print_message ${LOG_LEVEL_TRACE} "$@"; }
