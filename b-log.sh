@@ -77,7 +77,7 @@ B_LOG_LOG_VIA_FILE_PREFIX=false # add prefix to log file
 B_LOG_LOG_VIA_FILE_SUFFIX=false # add suffix to log file
 B_LOG_LOG_VIA_SYSLOG=""         # syslog flags so that "syslog 'flags' message"
 B_LOG_TS=""                     # timestamp variable
-B_LOG_TS_FORMAT="%Y-%m-%d %H:%M:%S.%N" # timestamp format
+B_LOG_TS_FORMAT="%Y-%m-%d$(echo -e "\uA0")%H:%M:%S.%N" # timestamp format
 B_LOG_LOG_LEVEL_NAME=""         # the name of the log level
 B_LOG_LOG_MESSAGE=""            # the log message
 
