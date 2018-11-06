@@ -70,16 +70,17 @@ readonly LOG_LEVELS_TEMPLATE=2
 readonly LOG_LEVELS_PREFIX=3
 readonly LOG_LEVELS_SUFFIX=4
 
-LOG_LEVEL=${LOG_LEVEL_WARN}     # current log level
-B_LOG_LOG_VIA_STDOUT=true       # log via stdout
-B_LOG_LOG_VIA_FILE=""           # file if logging via file (file, add suffix, add prefix)
-B_LOG_LOG_VIA_FILE_PREFIX=false # add prefix to log file
-B_LOG_LOG_VIA_FILE_SUFFIX=false # add suffix to log file
-B_LOG_LOG_VIA_SYSLOG=""         # syslog flags so that "syslog 'flags' message"
-B_LOG_TS=""                     # timestamp variable
-B_LOG_TS_FORMAT="%Y-%m-%d %H:%M:%S.%N" # timestamp format
-B_LOG_LOG_LEVEL_NAME=""         # the name of the log level
-B_LOG_LOG_MESSAGE=""            # the log message
+LOG_LEVEL=${LOG_LEVEL_WARN}               # current log level
+B_LOG_LOG_VIA_STDOUT=true                 # log via stdout
+B_LOG_LOG_VIA_STDOUT_NO_TEMPLATE=false    # use log level template by default
+B_LOG_LOG_VIA_FILE=""                     # file if logging via file (file, add suffix, add prefix)
+B_LOG_LOG_VIA_FILE_PREFIX=false           # add prefix to log file
+B_LOG_LOG_VIA_FILE_SUFFIX=false           # add suffix to log file
+B_LOG_LOG_VIA_SYSLOG=""                   # syslog flags so that "syslog 'flags' message"
+B_LOG_TS=""                               # timestamp variable
+B_LOG_TS_FORMAT="%Y-%m-%d %H:%M:%S.%N"    # timestamp format
+B_LOG_LOG_LEVEL_NAME=""                   # the name of the log level
+B_LOG_LOG_MESSAGE=""                      # the log message
 
 function B_LOG_ERR() {
     # @description internal error message handler
@@ -106,6 +107,7 @@ function B_LOG(){
         echo "  -V, --version           Version"
         echo "  -d, --date-format       Date format used in the log eg. '%Y-%m-%d %H:%M:%S.%N'"
         echo "  -o, --stdout            Log over stdout (true/false) default true."
+        echo "  --stdout-no-template    Disable template for standard out"
         echo "  -f, --file              File to log to, none set means disabled"
         echo "  --file-prefix-enable    Enable the prefix for the log file"
         echo "  --file-prefix-disable   Disable the prefix for the log file"
@@ -134,6 +136,7 @@ function B_LOG(){
             "--log-level") set -- "$@" "-l" ;;
             "--date-format") set -- "$@" "-d" ;;
             "--stdout") set -- "$@" "-o" ;;
+            "--stdout-no-template") set -- "$@" "-a" "stdout-no-template" ;;
             "--file") set -- "$@" "-f" ;;
             "--file-prefix-enable") set -- "$@" "-a" "file-prefix-enable" ;;
             "--file-prefix-disable") set -- "$@" "-a" "file-prefix-disable" ;;
@@ -179,6 +182,9 @@ function B_LOG(){
                         ;;
                     'file-suffix-disable' )
                         B_LOG_LOG_VIA_FILE_SUFFIX=false
+                        ;;
+                    'stdout-no-template' )
+                        B_LOG_LOG_VIA_STDOUT_NO_TEMPLATE=true
                         ;;
                     *)
                         ;;
@@ -313,13 +319,24 @@ function B_LOG_print_message() {
     if [ -z "$message" ]; then # if message is empty, get from stdin
         message="$(cat /dev/stdin)"
     fi
+
+    if [ -z "$message" ]; then # if message is still empty then don't print anything
+        return 0;
+    fi
+    
     B_LOG_LOG_MESSAGE="${message}"
     B_LOG_get_log_level_info "${log_level}" || true
     B_LOG_convert_template ${LOG_FORMAT} || true
     # output to stdout
     if [ "${B_LOG_LOG_VIA_STDOUT}" = true ]; then
         echo -ne "$LOG_PREFIX"
-        echo -ne "${B_LOG_CONVERTED_TEMPLATE_STRING}"
+
+        if [ "${B_LOG_LOG_VIA_STDOUT_NO_TEMPLATE}" = true ]; then
+          echo -ne "${B_LOG_LOG_MESSAGE}"
+        else
+          echo -ne "${B_LOG_CONVERTED_TEMPLATE_STRING}"
+        fi
+
         echo -e "$LOG_SUFFIX"
     fi
     # output to file
