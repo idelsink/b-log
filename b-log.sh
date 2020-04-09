@@ -295,6 +295,7 @@ function B_LOG_convert_template() {
 
 function B_LOG_print_message() {
     log_level=${1:-"$LOG_LEVEL_ERROR"}
+     shift
     
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
         if [ ! ${LOG_LEVEL} -eq ${LOG_LEVEL_ALL} ]; then # check log level
@@ -306,7 +307,6 @@ function B_LOG_print_message() {
     fi
     # log level bigger as LOG_LEVEL? and level is not -1? return
 
-    shift
     local message=${*:-}
     if [ -z "$message" ]; then # if message is empty, get from stdin
         while read -r line; do
