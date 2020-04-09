@@ -18,7 +18,7 @@
 #set -o pipefail # prevents errors in a pipeline from being masked
 
 B_LOG_APPNAME="b-log"
-B_LOG_VERSION=1.2.1
+B_LOG_VERSION=1.2.2
 
 # --- global variables ----------------------------------------------
 # log levels
@@ -258,10 +258,10 @@ function B_LOG_convert_template() {
                 log_layout_part="${B_LOG_LOG_LEVEL_NAME}"
                 ;;
             3) # function name
-                log_layout_part="${FUNCNAME[3]}"
+                log_layout_part="${FUNCNAME[4]}"
                 ;;
             4) # line number
-                log_layout_part="${BASH_LINENO[2]}"
+                log_layout_part="${BASH_LINENO[3]}"
                 ;;
             5) # message
                 log_layout_part="${B_LOG_LOG_MESSAGE}"
@@ -270,7 +270,7 @@ function B_LOG_convert_template() {
                 log_layout_part=" "
                 ;;
             7) # file name
-                log_layout_part="$(basename ${BASH_SOURCE[3]})"
+                log_layout_part="$(basename ${BASH_SOURCE[4]})"
                 ;;
             *)
                 B_LOG_ERR '1' "unknown template parameter: '$selector'"
@@ -294,27 +294,37 @@ function B_LOG_convert_template() {
 }
 
 function B_LOG_print_message() {
-    # @description
-    # @param $1 log type
-    # $2... the rest are messages
-    local file_directory=""
-    local err_ret_code=0
-    B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
     log_level=${1:-"$LOG_LEVEL_ERROR"}
-    
-    shift
-    local message=${*:-}
-    if [ -z "$message" ]; then # if message is empty, get from stdin
-        message="$(cat /dev/stdin)"
-    fi
     
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
         if [ ! ${LOG_LEVEL} -eq ${LOG_LEVEL_ALL} ]; then # check log level
+            if [ -z "${*:-}" ]; then # if message is empty, consume stdin
+                cat > /dev/null
+            fi
             return 0;
         fi
     fi
     # log level bigger as LOG_LEVEL? and level is not -1? return
 
+    shift
+    local message=${*:-}
+    if [ -z "$message" ]; then # if message is empty, get from stdin
+        while read -r line; do
+            B_LOG_print_message_line "${line}"
+        done < /dev/stdin
+    else 
+        B_LOG_print_message_line "${message}"
+    fi
+    
+}
+
+B_LOG_print_message_line() {
+    local message=${1:-}
+
+    local file_directory=""
+    local err_ret_code=0
+    B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
+    
     B_LOG_LOG_MESSAGE="${message}"
     B_LOG_get_log_level_info "${log_level}" || true
     B_LOG_convert_template ${LOG_FORMAT} || true
