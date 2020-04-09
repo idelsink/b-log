@@ -50,7 +50,7 @@ readonly LOG_LEVEL_ALL=-1       # all enabled
 # 5: log message
 # 6: space
 # 7: filename
-B_LOG_DEFAULT_TEMPLATE="[@23:1@][@6:2@][@3@:@3:4@] @5@"  # default template
+: "${B_LOG_DEFAULT_TEMPLATE:="[@23:1@][@6:2@][@3@:@3:4@] @5@"}" # default template
 
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
