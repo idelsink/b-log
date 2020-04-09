@@ -18,7 +18,7 @@
 #set -o pipefail # prevents errors in a pipeline from being masked
 
 B_LOG_APPNAME="b-log"
-B_LOG_VERSION=1.2.0
+B_LOG_VERSION=1.2.1
 
 # --- global variables ----------------------------------------------
 # log levels
@@ -301,6 +301,13 @@ function B_LOG_print_message() {
     local err_ret_code=0
     B_LOG_TS=$(date +"${B_LOG_TS_FORMAT}") # get the date
     log_level=${1:-"$LOG_LEVEL_ERROR"}
+    
+    shift
+    local message=${*:-}
+    if [ -z "$message" ]; then # if message is empty, get from stdin
+        message="$(cat /dev/stdin)"
+    fi
+    
     if [ ${log_level} -gt ${LOG_LEVEL} ]; then # check log level
         if [ ! ${LOG_LEVEL} -eq ${LOG_LEVEL_ALL} ]; then # check log level
             return 0;
@@ -308,11 +315,6 @@ function B_LOG_print_message() {
     fi
     # log level bigger as LOG_LEVEL? and level is not -1? return
 
-    shift
-    local message=${*:-}
-    if [ -z "$message" ]; then # if message is empty, get from stdin
-        message="$(cat /dev/stdin)"
-    fi
     B_LOG_LOG_MESSAGE="${message}"
     B_LOG_get_log_level_info "${log_level}" || true
     B_LOG_convert_template ${LOG_FORMAT} || true
