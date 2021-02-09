@@ -55,13 +55,13 @@ B_LOG_DEFAULT_TEMPLATE="[@23:1@][@6:2@][@3@:@3:4@] @5@"  # default template
 # log levels information
 # level code, level name, level template, prefix(colors etc.), suffix(colors etc.)
 LOG_LEVELS=(
-    "${LOG_LEVEL_FATAL}"  "FATAL"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[41;37m" "\e[0m"
-    "${LOG_LEVEL_ERROR}"  "ERROR"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;31m" "\e[0m"
-    "${LOG_LEVEL_WARN}"   "WARN"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;33m" "\e[0m"
-    "${LOG_LEVEL_NOTICE}" "NOTICE" "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;32m" "\e[0m"
-    "${LOG_LEVEL_INFO}"   "INFO"   "${B_LOG_DEFAULT_TEMPLATE}" "\e[37m" "\e[0m"
-    "${LOG_LEVEL_DEBUG}"  "DEBUG"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[1;34m" "\e[0m"
-    "${LOG_LEVEL_TRACE}"  "TRACE"  "${B_LOG_DEFAULT_TEMPLATE}" "\e[94m" "\e[0m"
+    "${LOG_LEVEL_FATAL}"  "FATAL"  "${B_LOG_DEFAULT_TEMPLATE}" "\033[41;37m" "\033[0m"
+    "${LOG_LEVEL_ERROR}"  "ERROR"  "${B_LOG_DEFAULT_TEMPLATE}" "\033[1;31m" "\033[0m"
+    "${LOG_LEVEL_WARN}"   "WARN"   "${B_LOG_DEFAULT_TEMPLATE}" "\033[1;33m" "\033[0m"
+    "${LOG_LEVEL_NOTICE}" "NOTICE" "${B_LOG_DEFAULT_TEMPLATE}" "\033[1;32m" "\033[0m"
+    "${LOG_LEVEL_INFO}"   "INFO"   "${B_LOG_DEFAULT_TEMPLATE}" "\033[37m" "\033[0m"
+    "${LOG_LEVEL_DEBUG}"  "DEBUG"  "${B_LOG_DEFAULT_TEMPLATE}" "\033[1;34m" "\033[0m"
+    "${LOG_LEVEL_TRACE}"  "TRACE"  "${B_LOG_DEFAULT_TEMPLATE}" "\033[94m" "\033[0m"
 )
 # log levels columns
 readonly LOG_LEVELS_LEVEL=0
@@ -87,8 +87,8 @@ function B_LOG_ERR() {
     # @param $2 message when return code is 1
     local return_code=${1:-0}
     local return_message=${2:=""}
-    local prefix="\e[1;31m" # error color
-    local suffix="\e[0m"    # error color
+    local prefix="\033[1;31m" # error color
+    local suffix="\033[0m"    # error color
     if [ $return_code -eq 1 ]; then
         echo -e "${prefix}${return_message}${suffix}"
     fi
